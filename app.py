@@ -15,17 +15,28 @@ st.title("Urban Air Pollution Research Dashboard")
 city = st.text_input("Enter City")
 
 if city:
+    import os
+    import pandas as pd
     lat, lon = geocode_city(city)
+    csv_path = f"data/{city.lower().replace(' ', '_')}_pollution.csv"
     records = fetch_pollution(lat, lon)
+    weather_records = fetch_weather(lat, lon, None, None)  # Fetch weather raw
+    # Convert both to DataFrames with only API headers
+    pollution_raw = pd.json_normalize(records)
+    weather_raw = pd.json_normalize(weather_records)
+    # Append both to CSV
+    if os.path.exists(csv_path):
+        old_raw = pd.read_csv(csv_path)
+        pollution_raw = pd.concat([old_raw, pollution_raw]).drop_duplicates()
+    pollution_raw.to_csv(csv_path, index=False)
+    # Now preprocess for dashboard
     pollution = preprocess_pollution(records)
     start = pollution["date"].min().strftime("%Y-%m-%d")
     end = pollution["date"].max().strftime("%Y-%m-%d")
     weather = fetch_weather(lat, lon, start, end)
-    # Merge on both date and hour for hourly analysis
     if not pollution.empty and not weather.empty:
         df = pollution.merge(weather, on=["date", "hour"], how="inner")
         df = create_features(df)
-        # Remove minute-related columns if present
         for col in ["minute", "minutex", "miny", "minute_x", "minute_y"]:
             if col in df.columns:
                 df = df.drop(columns=col)
@@ -83,6 +94,25 @@ if city:
         fig_reg.add_trace(go.Scatter(x=reg_df["date"], y=reg_df["prediction"], mode="lines", name="Prediction"))
         fig_reg.update_layout(title="Regression Model")
         st.plotly_chart(fig_reg, key="regression")
+
+        # Custom plot of any two components
+        st.subheader("Custom Component Scatter Plot")
+        component_cols = [col for col in df.columns if col.startswith("components.")]
+        if len(component_cols) >= 2:
+            x_comp = st.selectbox("Select X Component", component_cols, key="custom_x")
+            y_comp = st.selectbox("Select Y Component", component_cols, key="custom_y")
+            fig_custom = go.Figure()
+            fig_custom.add_trace(go.Scatter(
+                x=df[x_comp],
+                y=df[y_comp],
+                mode="markers",
+                marker=dict(size=6, opacity=0.7),
+                name=f"{x_comp} vs {y_comp}"
+            ))
+            fig_custom.update_layout(title=f"{x_comp} vs {y_comp}", xaxis_title=x_comp, yaxis_title=y_comp)
+            st.plotly_chart(fig_custom, key="custom_plot")
+        else:
+            st.info("Not enough pollution components for custom plot.")
         from src.temporal_analysis import hourly_trends, daily_trends, monthly_trends, seasonal_trends, yearly_trends
         st.subheader("Hourly PM2.5 Trends")
         hourly = hourly_trends(df)
@@ -116,6 +146,8 @@ if city:
         fig_yearly.update_layout(title="Yearly PM2.5")
         st.plotly_chart(fig_yearly, key="yearly")
         st.subheader("Pollution Map")
+        if st.button("Refresh Pollution Map"):
+            st.experimental_rerun()
         st.plotly_chart(pollution_map(df, lat, lon), key="map")
     else:
         st.error("No data available for selected city or time period.")
