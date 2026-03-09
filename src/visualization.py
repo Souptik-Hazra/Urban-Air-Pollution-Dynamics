@@ -1,15 +1,27 @@
-import plotly.express as px
+import plotly.graph_objects as go
 
 def pollution_map(df, lat, lon):
     df["lat"] = lat
     df["lon"] = lon
-    fig = px.scatter_mapbox(
-        df,
-        lat="lat",
-        lon="lon",
-        color="components.pm2_5",
-        size="components.pm2_5",
-        zoom=5,
-        mapbox_style="open-street-map"
+    fig = go.Figure(go.Scattermapbox(
+        lat=df["lat"],
+        lon=df["lon"],
+        mode="markers",
+        marker=go.scattermapbox.Marker(
+            size=df["components.pm2_5"],
+            color=df["components.pm2_5"],
+            colorscale="Viridis",
+            showscale=True
+        ),
+        text=df["components.pm2_5"],
+        hoverinfo="text"
+    ))
+    fig.update_layout(
+        mapbox=dict(
+            style="open-street-map",
+            zoom=5,
+            center=dict(lat=lat, lon=lon)
+        ),
+        margin={"r":0,"t":0,"l":0,"b":0}
     )
     return fig

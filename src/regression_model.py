@@ -5,9 +5,7 @@ def train_model(df):
         "temp",
         "humidity",
         "wind",
-        "pressure",
-        "pm25_lag1",
-        "pm25_roll7"
+        "pressure"
     ]
     X = df[features]
     y = df["components.pm2_5"]
