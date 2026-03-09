@@ -147,7 +147,7 @@ if city:
         st.plotly_chart(fig_yearly, key="yearly")
         st.subheader("Pollution Map")
         if st.button("Refresh Pollution Map"):
-            st.experimental_rerun()
+            st.rerun()
         st.plotly_chart(pollution_map(df, lat, lon), key="map")
     else:
         st.error("No data available for selected city or time period.")
