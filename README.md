@@ -20,7 +20,7 @@ A Streamlit dashboard for visualizing, analyzing, and exploring urban air pollut
 	- Hourly, Daily, Monthly, Seasonal, Yearly Trends
 	- Pollution Map (with manual refresh)
 	- Custom scatter plot for any two pollution components
-- Manual refresh button for pollution map
+- Pollution map
 - Custom plot selection via dropdowns
 
 ## Usage
@@ -28,38 +28,3 @@ A Streamlit dashboard for visualizing, analyzing, and exploring urban air pollut
 2. Enter a city name to fetch and visualize data
 3. Inspect raw API data in browser tabs
 4. Explore interactive plots and custom scatter plots
-
-## Images
-(Add your screenshots below each section)
-
-### Dataset & Raw API Data
-_Example: Screenshot of dataset and raw API tabs_
-
-### Time Series
-_Example: Screenshot of PM2.5 time series plot_
-
-### Correlation Heatmap
-_Example: Screenshot of correlation heatmap_
-
-### Pollution Clusters (3D)
-_Example: Screenshot of 3D cluster plot_
-
-### Regression Model
-_Example: Screenshot of regression plot_
-
-### Trends (Hourly, Daily, etc.)
-_Example: Screenshot of trend plots_
-
-### Pollution Map
-_Example: Screenshot of pollution map with refresh button_
-
-### Custom Component Scatter Plot
-_Example: Screenshot of custom scatter plot selection_
-
----
-
-## Interviewer Notes
-- All code is modular and organized for easy review
-- Data is always saved before processing
-- All visualizations are interactive and customizable
-- Easy to extend for more cities, data sources, or plot types
